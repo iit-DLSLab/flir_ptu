@@ -71,10 +71,17 @@ protected:
 
   serial::Serial m_ser;
   std::string m_joint_name_prefix;
+
+  double pan;
+  double tilt;
+
+  double panspeed;
+  double tiltspeed;
+
 };
 
 Node::Node(ros::NodeHandle& node_handle)
-  : m_pantilt(NULL), m_node(node_handle)
+  : m_pantilt(NULL), m_node(node_handle),pan(0),tilt(0),panspeed(0),tiltspeed(0)
 {
   m_updater = new diagnostic_updater::Updater();
   m_updater->setHardwareID("none");
@@ -178,10 +185,10 @@ void Node::cmdCallback(const sensor_msgs::JointState::ConstPtr& msg)
     return;
   }
 
-  double pan = msg->position[0];
-  double tilt = msg->position[1];
-  double panspeed = msg->velocity[0];
-  double tiltspeed = msg->velocity[1];
+  pan = msg->position[0];
+  tilt = msg->position[1];
+  panspeed = msg->velocity[0];
+  tiltspeed = msg->velocity[1];
   m_pantilt->setPosition(PTU_PAN, pan);
   m_pantilt->setPosition(PTU_TILT, tilt);
   m_pantilt->setSpeed(PTU_PAN, panspeed);
@@ -204,11 +211,19 @@ void Node::spinCallback(const ros::TimerEvent&)
   if (!ok()) return;
 
   // Read Position & Speed
-  double pan  = m_pantilt->getPosition(PTU_PAN);
-  double tilt = m_pantilt->getPosition(PTU_TILT);
+  if(m_pantilt->getPosition(PTU_PAN) != -1){
+      pan  = m_pantilt->getPosition(PTU_PAN);
+  }
+  if( m_pantilt->getPosition(PTU_TILT) != 1){
+      tilt = m_pantilt->getPosition(PTU_TILT);
+  }
 
-  double panspeed  = m_pantilt->getSpeed(PTU_PAN);
-  double tiltspeed = m_pantilt->getSpeed(PTU_TILT);
+  if(m_pantilt->getSpeed(PTU_PAN) != -1){
+      panspeed  = m_pantilt->getSpeed(PTU_PAN);
+  }
+  if(m_pantilt->getSpeed(PTU_TILT) != -1){
+      tiltspeed = m_pantilt->getSpeed(PTU_TILT);
+  }
 
   // Publish Position & Speed
   sensor_msgs::JointState joint_state;
