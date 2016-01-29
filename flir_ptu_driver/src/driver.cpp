@@ -49,11 +49,17 @@ namespace flir_ptu_driver
 template<typename T>
 T parseResponse(std::string responseBuffer)
 {
-  std::string trimmed = responseBuffer.substr(1);
-  boost::trim(trimmed);
-  T parsed = lexical_cast<T>(trimmed);
-  ROS_DEBUG_STREAM("Parsed response value: " << parsed);
-  return parsed;
+    std::string trimmed = responseBuffer.substr(1);
+    boost::trim(trimmed);
+    try {
+        T parsed = lexical_cast<T>(trimmed);
+        ROS_DEBUG_STREAM("Parsed response value: " << parsed);
+        return parsed;
+    } catch(boost::bad_lexical_cast e){
+        std::cerr << "ERROR: impossible to parse the following PTU message: ";
+        std::cerr << std::endl << "\"" << responseBuffer << "\"" << std::endl;
+        return -1;
+    }
 }
 
 bool PTU::initialized()
