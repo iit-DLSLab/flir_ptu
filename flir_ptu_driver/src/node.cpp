@@ -81,7 +81,8 @@ protected:
 };
 
 Node::Node(ros::NodeHandle& node_handle)
-  : m_pantilt(NULL), m_node(node_handle),pan(0),tilt(0),panspeed(0),tiltspeed(0)
+  : m_pantilt(NULL), m_node(node_handle),
+    pan(0), tilt(0), panspeed(0), tiltspeed(0)
 {
   m_updater = new diagnostic_updater::Updater();
   m_updater->setHardwareID("none");
@@ -159,8 +160,8 @@ void Node::connect()
                 <sensor_msgs::JointState>("state", 1);
 
   // Subscribers : Only subscribe to the most recent instructions
-  m_joint_sub = m_node.subscribe
-                <sensor_msgs::JointState>("cmd", 1, &Node::cmdCallback, this);
+  //m_joint_sub = m_node.subscribe
+  //              <sensor_msgs::JointState>("cmd", 1, &Node::cmdCallback, this);
 }
 
 /** Disconnect */
